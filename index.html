@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lead Tracker">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-touch-fullscreen" content="yes">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230a0a0a' width='100' height='100' rx='20'/><text x='50' y='68' text-anchor='middle' font-size='50'>⚡</text></svg>">
+<title>Lead Tracker</title>
+<style>
+:root {
+  --bg: #0a0a0a;
+  --bg-elevated: #141414;
+  --bg-card: #1a1a1e;
+  --bg-card-alt: #1f1f24;
+  --accent: #f97316;
+  --accent-dim: rgba(249,115,22,0.12);
+  --accent-glow: rgba(249,115,22,0.25);
+  --green: #22c55e;
+  --green-dim: rgba(34,197,94,0.12);
+  --yellow: #eab308;
+  --yellow-dim: rgba(234,179,8,0.12);
+  --red: #ef4444;
+  --red-dim: rgba(239,68,68,0.12);
+  --blue: #3b82f6;
+  --blue-dim: rgba(59,130,246,0.12);
+  --purple: #818cf8;
+  --purple-dim: rgba(129,140,248,0.12);
+  --text: #f0f0f0;
+  --text-secondary: #a1a1aa;
+  --text-dim: #71717a;
+  --border: rgba(255,255,255,0.08);
+  --border-light: rgba(255,255,255,0.04);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --radius: 14px;
+  --radius-sm: 10px;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { background: var(--bg); }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+input, select, textarea, button { font-family: inherit; -webkit-appearance: none; appearance: none; }
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2371717a'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px !important;
+}
+::-webkit-scrollbar { width: 0; height: 0; }
+
+/* Header */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,10,10,0.82);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  padding: calc(var(--safe-top) + 10px) 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+.header-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.header-title { font-size:20px; font-weight:800; letter-spacing:-0.3px; }
+.header-title span { color: var(--accent); }
+.header-subtitle { font-size:10px; color:var(--text-dim); letter-spacing:1.5px; text-transform:uppercase; margin-top:1px; }
+.header-actions { display:flex; gap:8px; align-items:center; }
+.icon-btn {
+  width:36px; height:36px; border-radius:50%; border:1px solid var(--border);
+  background: var(--bg-elevated); color: var(--text-secondary);
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  font-size:16px; transition: all 0.15s;
+}
+.icon-btn:active { transform:scale(0.92); background: var(--bg-card); }
+
+/* Tabs */
+.tabs { display:flex; gap:0; margin:0 -16px; }
+.tab {
+  flex:1; padding:10px 0 8px; text-align:center; font-size:12px; font-weight:600;
+  letter-spacing:0.5px; border:none; background:transparent; color:var(--text-dim);
+  cursor:pointer; position:relative; transition: color 0.2s;
+}
+.tab.active { color: var(--accent); }
+.tab.active::after {
+  content:''; position:absolute; bottom:0; left:20%; right:20%;
+  height:2px; background:var(--accent); border-radius:1px;
+}
+
+/* Dashboard */
+.dashboard { padding:16px; }
+.stats-grid {
+  display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px; margin-bottom:14px;
+}
+.stat-card {
+  background: var(--bg-card); border-radius: var(--radius-sm); padding:12px 8px;
+  text-align:center; border:1px solid var(--border);
+}
+.stat-value { font-size:22px; font-weight:800; line-height:1; }
+.stat-label { font-size:9px; color:var(--text-dim); letter-spacing:1.5px; text-transform:uppercase; margin-top:4px; }
+
+/* Goal bar */
+.goal-bar { background: var(--bg-card); border-radius: var(--radius-sm); padding:12px 14px; margin-bottom:14px; border:1px solid var(--border); }
+.goal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.goal-label { font-size:11px; color:var(--text-dim); letter-spacing:1px; text-transform:uppercase; font-weight:600; }
+.goal-count { font-size:15px; font-weight:800; }
+.goal-track { height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+.goal-fill { height:100%; border-radius:3px; transition:width 0.5s cubic-bezier(0.4,0,0.2,1); }
+.goal-hint { font-size:11px; color:var(--text-dim); margin-top:5px; }
+
+/* Pipeline cards */
+.pipeline-row {
+  display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;
+}
+.pipeline-card {
+  background: var(--bg-card); border-radius: var(--radius-sm); padding:14px;
+  border:1px solid var(--border);
+}
+.pipeline-value { font-size:20px; font-weight:800; line-height:1; margin-bottom:3px; }
+.pipeline-label { font-size:10px; color:var(--text-dim); letter-spacing:1px; text-transform:uppercase; }
+
+/* Search & controls */
+.controls { padding:0 16px 12px; }
+.search-row { display:flex; gap:8px; margin-bottom:8px; }
+.search-input {
+  flex:1; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm);
+  padding:10px 14px 10px 36px; color:var(--text); font-size:15px; outline:none;
+  transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--accent); }
+.search-wrap { position:relative; flex:1; }
+.search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-dim); font-size:14px; pointer-events:none; }
+.sort-select {
+  background: var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm);
+  padding:10px 28px 10px 10px; color:var(--text-secondary); font-size:13px; outline:none; cursor:pointer;
+}
+.filter-row { display:flex; gap:6px; overflow-x:auto; padding-bottom:2px; -webkit-overflow-scrolling:touch; }
+.filter-pill {
+  padding:6px 14px; border-radius:20px; border:1px solid var(--border);
+  background:transparent; color:var(--text-dim); font-size:12px; font-weight:500;
+  white-space:nowrap; cursor:pointer; transition:all 0.2s;
+}
+.filter-pill.active { background:var(--accent); border-color:var(--accent); color:#000; font-weight:600; }
+
+/* Lead Cards */
+.leads-container { padding:0 16px 120px; }
+.section-label {
+  font-size:11px; color:var(--text-dim); letter-spacing:1.5px; text-transform:uppercase;
+  font-weight:600; margin:16px 0 8px; padding:0 2px;
+}
+.lead-card {
+  background: var(--bg-card); border-radius: var(--radius); padding:14px 16px;
+  margin-bottom:8px; border:1px solid var(--border); position:relative;
+  transition: transform 0.15s, background 0.15s; cursor:pointer;
+  overflow:hidden;
+}
+.lead-card:active { transform:scale(0.98); background: var(--bg-card-alt); }
+.lead-card-accent {
+  position:absolute; left:0; top:0; bottom:0; width:3px;
+}
+.lead-top { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+.lead-business { font-size:16px; font-weight:700; letter-spacing:-0.2px; line-height:1.2; }
+.lead-city { font-size:13px; color:var(--text-dim); margin-top:2px; }
+.lead-pills { display:flex; gap:5px; flex-wrap:wrap; margin-top:8px; align-items:center; }
+.pill {
+  display:inline-flex; align-items:center; gap:3px;
+  padding:3px 8px; border-radius:6px; font-size:11px; font-weight:600;
+  letter-spacing:0.3px;
+}
+.lead-info { display:flex; gap:12px; flex-wrap:wrap; margin-top:8px; font-size:12px; color:var(--text-dim); }
+.lead-info a { color:var(--text-secondary); text-decoration:none; }
+.lead-info a:active { color:var(--accent); }
+.lead-operator {
+  margin-top:8px; font-size:12px; color:var(--yellow);
+  background:var(--yellow-dim); border:1px solid rgba(234,179,8,0.15);
+  border-radius:8px; padding:6px 10px;
+}
+.lead-notes-preview {
+  margin-top:8px; font-size:12px; color:var(--text-dim);
+  border-left:2px solid var(--border); padding-left:8px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.badge {
+  padding:3px 8px; border-radius:6px; font-size:10px; font-weight:700;
+  letter-spacing:0.5px; white-space:nowrap;
+}
+.badge-overdue { background:var(--red-dim); color:var(--red); }
+.badge-today { background:var(--yellow-dim); color:var(--yellow); }
+.badge-soon { background:var(--accent-dim); color:var(--accent); }
+.badge-ok { background:rgba(255,255,255,0.04); color:var(--text-dim); }
+
+/* Quick Actions overlay */
+.quick-actions-overlay {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:300;
+  align-items:flex-end; justify-content:center;
+}
+.quick-actions-overlay.open { display:flex; }
+.quick-actions {
+  background: var(--bg-elevated); border-radius:20px 20px 0 0; width:100%;
+  max-width:500px; padding:8px 16px calc(16px + var(--safe-bottom));
+  animation: sheetUp 0.25s cubic-bezier(0.32,0.72,0,1);
+}
+.quick-actions-handle { width:36px; height:4px; background:rgba(255,255,255,0.15); border-radius:2px; margin:4px auto 12px; }
+.quick-actions-title { font-size:14px; font-weight:700; margin-bottom:12px; padding:0 4px; }
+.qa-btn {
+  display:flex; align-items:center; gap:12px; width:100%; padding:14px 12px;
+  background:transparent; border:none; border-bottom:1px solid var(--border);
+  color:var(--text); font-size:15px; cursor:pointer; text-align:left;
+  transition: background 0.1s;
+}
+.qa-btn:active { background:rgba(255,255,255,0.04); }
+.qa-btn:last-child { border-bottom:none; }
+.qa-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; }
+.qa-btn.danger { color:var(--red); }
+
+/* FAB */
+.fab {
+  position:fixed; bottom:calc(24px + var(--safe-bottom)); right:20px;
+  width:56px; height:56px; border-radius:28px; border:none;
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color:#fff; font-size:28px; font-weight:300;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 4px 24px rgba(249,115,22,0.4), 0 0 0 0 rgba(249,115,22,0);
+  cursor:pointer; z-index:90; transition: transform 0.15s, box-shadow 0.15s;
+}
+.fab:active { transform:scale(0.9); }
+
+/* Modal / Bottom Sheet */
+.modal-overlay {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:200;
+  align-items:flex-end; justify-content:center;
+}
+.modal-overlay.open { display:flex; }
+.modal {
+  background: var(--bg-elevated); border-radius:20px 20px 0 0; width:100%;
+  max-width:500px; max-height:92dvh; overflow-y:auto;
+  padding:0 20px calc(20px + var(--safe-bottom));
+  animation: sheetUp 0.3s cubic-bezier(0.32,0.72,0,1);
+  overscroll-behavior: contain;
+}
+@keyframes sheetUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
+.modal-handle { width:36px; height:4px; background:rgba(255,255,255,0.15); border-radius:2px; margin:8px auto 16px; }
+.modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+.modal-title { font-size:20px; font-weight:700; }
+.modal-close {
+  width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,0.08);
+  border:none; color:var(--text-secondary); font-size:18px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+}
+.form-group { margin-bottom:16px; }
+.form-label { display:block; font-size:12px; color:var(--text-dim); margin-bottom:6px; font-weight:600; letter-spacing:0.3px; }
+.form-label.highlight { color: var(--yellow); }
+.form-input {
+  width:100%; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm);
+  padding:12px 14px; color:var(--text); font-size:15px; outline:none; transition:border-color 0.2s;
+}
+.form-input:focus { border-color: var(--accent); }
+.form-input::placeholder { color: var(--text-dim); }
+textarea.form-input { resize:vertical; min-height:70px; }
+.form-row { display:flex; gap:10px; }
+.form-row .form-group { flex:1; }
+.method-btns { display:flex; gap:6px; flex-wrap:wrap; }
+.method-btn {
+  padding:8px 12px; border-radius:20px; font-size:12px; font-weight:600;
+  border:1px solid var(--border); background:transparent; color:var(--text-dim);
+  cursor:pointer; transition:all 0.15s;
+}
+.method-btn.active { border-color:var(--accent); background:var(--accent-dim); color:var(--accent); }
+.btn-primary {
+  width:100%; padding:14px; border-radius:12px; border:none;
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color:#fff; font-size:16px; font-weight:700; cursor:pointer;
+  transition: opacity 0.15s;
+}
+.btn-primary:active { opacity:0.85; }
+.btn-primary:disabled { opacity:0.4; }
+.btn-danger {
+  width:100%; padding:12px; border-radius:12px; border:1px solid var(--red);
+  background:transparent; color:var(--red); font-size:14px; font-weight:600;
+  cursor:pointer; margin-top:8px;
+}
+.followup-calc { font-size:12px; color:var(--text-dim); margin-top:4px; }
+.followup-calc strong { color:var(--accent); }
+
+/* Activity log */
+.activity-section { margin-bottom:16px; }
+.activity-log { background:var(--bg); border-radius:var(--radius-sm); padding:8px 10px; max-height:140px; overflow-y:auto; margin-top:6px; }
+.activity-entry { font-size:12px; padding:6px 0; border-bottom:1px solid var(--border); }
+.activity-entry:last-child { border-bottom:none; }
+.activity-date { color:var(--accent); font-weight:600; font-size:11px; }
+.activity-note { color:var(--text-dim); margin-top:1px; }
+.activity-add { display:flex; gap:8px; margin-top:8px; }
+.activity-add input { flex:1; }
+.activity-add-btn {
+  background:var(--accent); border:none; color:#fff; border-radius:var(--radius-sm);
+  padding:10px 14px; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap;
+}
+
+/* Week/Month views */
+.view-container { padding:16px; padding-bottom:120px; }
+.method-grid { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+.method-card {
+  flex:1; min-width:70px; text-align:center;
+  background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm);
+  padding:10px 6px;
+}
+.method-card-icon { font-size:20px; }
+.method-card-count { font-size:20px; font-weight:800; color:var(--accent); margin:2px 0; }
+.method-card-label { font-size:9px; color:var(--text-dim); letter-spacing:1px; text-transform:uppercase; }
+.day-group { margin-bottom:16px; }
+.day-label { font-size:11px; color:var(--yellow); letter-spacing:1px; margin-bottom:6px; font-weight:600; }
+.day-card {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 12px; background:var(--bg-card); border:1px solid var(--border);
+  border-radius:var(--radius-sm); margin-bottom:4px;
+}
+.day-card-name { font-size:14px; font-weight:600; }
+.day-card-detail { font-size:11px; color:var(--text-dim); margin-top:1px; }
+
+/* Weekly pace bars */
+.pace-bar { margin-bottom:10px; }
+.pace-header { display:flex; justify-content:space-between; font-size:11px; color:var(--text-dim); margin-bottom:4px; }
+.pace-track { height:5px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+.pace-fill { height:100%; border-radius:3px; transition:width 0.4s; }
+
+/* Settings sheet */
+.settings-overlay {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:250;
+  align-items:flex-end; justify-content:center;
+}
+.settings-overlay.open { display:flex; }
+.settings-sheet {
+  background: var(--bg-elevated); border-radius:20px 20px 0 0; width:100%;
+  max-width:500px; max-height:70dvh; overflow-y:auto;
+  padding:0 20px calc(20px + var(--safe-bottom));
+  animation: sheetUp 0.25s cubic-bezier(0.32,0.72,0,1);
+}
+.settings-item {
+  display:flex; align-items:center; gap:12px; padding:14px 0;
+  border-bottom:1px solid var(--border); cursor:pointer;
+}
+.settings-item:active { opacity:0.7; }
+.settings-icon { font-size:20px; width:32px; text-align:center; }
+.settings-label { font-size:15px; flex:1; }
+.settings-label small { display:block; font-size:12px; color:var(--text-dim); font-weight:400; }
+
+/* Bulk select bar */
+.bulk-bar {
+  display:none; position:fixed; bottom:0; left:0; right:0; z-index:95;
+  background:rgba(10,10,10,0.95); backdrop-filter:blur(10px);
+  padding:12px 16px calc(12px + var(--safe-bottom));
+  border-top:1px solid var(--accent);
+  align-items:center; gap:10px;
+}
+.bulk-bar.active { display:flex; }
+.bulk-count { font-size:14px; font-weight:600; color:var(--accent); flex:1; }
+.bulk-btn {
+  padding:8px 16px; border-radius:8px; border:none; font-size:13px; font-weight:600;
+  cursor:pointer;
+}
+
+/* Print button */
+.print-btn {
+  background:var(--accent); color:#000; border:none; padding:10px 16px;
+  border-radius:var(--radius-sm); font-weight:700; font-size:13px; cursor:pointer;
+  display:flex; align-items:center; gap:6px;
+}
+.print-btn:active { opacity:0.8; }
+
+/* Empty state */
+.empty { text-align:center; padding:60px 20px; color:var(--text-dim); }
+.empty-icon { font-size:48px; margin-bottom:12px; opacity:0.6; }
+.empty-text { font-size:14px; }
+
+/* Toasts */
+.toast {
+  position:fixed; top:calc(var(--safe-top) + 60px); left:50%; transform:translateX(-50%);
+  background:var(--bg-card); border:1px solid var(--border); border-radius:12px;
+  padding:10px 18px; font-size:13px; font-weight:600; z-index:500;
+  box-shadow:0 8px 32px rgba(0,0,0,0.4); animation: toastIn 0.3s ease-out;
+  pointer-events:none;
+}
+@keyframes toastIn { from { opacity:0; transform:translateX(-50%) translateY(-10px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+
+/* Checkbox */
+.lead-check {
+  width:22px; height:22px; border-radius:6px; border:2px solid var(--border);
+  background:transparent; cursor:pointer; display:flex; align-items:center;
+  justify-content:center; font-size:12px; color:transparent; flex-shrink:0;
+  transition: all 0.15s;
+}
+.lead-check.checked { border-color:var(--accent); background:var(--accent); color:#000; }
+
+/* Animations */
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+.fade-in { animation: fadeIn 0.2s ease-out; }
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+'use strict';
+
+// ============ CONSTANTS ============
+const STORAGE_KEY = 'leadtracker_v2';
+const LEGACY_KEYS = ['wca_leads', 'leadtracker_v1'];
+const WEEKLY_GOAL = 20;
+
+const STATUS_MAP = {
+  'new':            { label:'New',            color:'#3b82f6', bg:'rgba(59,130,246,0.12)' },
+  'contacted':      { label:'Contacted',      color:'#eab308', bg:'rgba(234,179,8,0.12)' },
+  'interested':     { label:'Interested',     color:'#10b981', bg:'rgba(16,185,129,0.12)' },
+  'follow-up':      { label:'Follow-Up',      color:'#f97316', bg:'rgba(249,115,22,0.12)' },
+  'quoted':         { label:'Quoted',         color:'#f97316', bg:'rgba(249,115,22,0.12)' },
+  'signed':         { label:'Signed',         color:'#22c55e', bg:'rgba(34,197,94,0.15)' },
+  'won':            { label:'Won',            color:'#22c55e', bg:'rgba(34,197,94,0.15)' },
+  'not-interested': { label:'Not Interested', color:'#ef4444', bg:'rgba(239,68,68,0.12)' },
+  'lost':           { label:'Lost',           color:'#ef4444', bg:'rgba(239,68,68,0.12)' },
+};
+
+const METHODS = [
+  { value:'in-person', label:'In-Person', icon:'\uD83D\uDE97' },
+  { value:'phone',     label:'Phone',     icon:'\uD83D\uDCDE' },
+  { value:'email',     label:'Email',     icon:'\u2709\uFE0F' },
+  { value:'text',      label:'Text',      icon:'\uD83D\uDCAC' },
+];
+
+const ARCADE_OPTIONS = [
+  { v:'', l:'-- None --' },
+  { v:'Broken Arcade',  l:'Broken Arcade' },
+  { v:'Has Arcade',     l:'Has Arcade' },
+  { v:'No Arcade',      l:'No Arcade' },
+  { v:'Wants Games',    l:'Wants Games' },
+];
+
+// ============ STATE ============
+let leads = [];
+let tab = 'leads';
+let filter = 'all';
+let methodFilter = 'all';
+let search = '';
+let sortBy = 'followup';
+let showForm = false;
+let editId = null;
+let formData = {};
+let quickActionId = null;
+let showSettings = false;
+let bulkMode = false;
+let bulkSelected = new Set();
+
+// ============ DATA ============
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(leads)); } catch(e) {}
+}
+
+function load() {
+  try {
+    const d = localStorage.getItem(STORAGE_KEY);
+    if (d) { leads = JSON.parse(d); return; }
+  } catch(e) {}
+  // Data migration from legacy keys
+  let merged = [];
+  const seen = new Set();
+  for (const key of LEGACY_KEYS) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) continue;
+      const arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) continue;
+      for (const item of arr) {
+        const normalized = migrateLead(item);
+        const sig = (normalized.business||'').toLowerCase() + '|' + (normalized.city||'').toLowerCase() + '|' + (normalized.phone||'');
+        if (!seen.has(sig)) {
+          seen.add(sig);
+          merged.push(normalized);
+        }
+      }
+    } catch(e) {}
+  }
+  if (merged.length > 0) {
+    leads = merged;
+    save();
+    showToast('Imported ' + merged.length + ' leads from previous version');
+  }
+}
+
+function migrateLead(l) {
+  // Normalize fields from both legacy formats
+  const out = {
+    id: l.id || genId(),
+    business: l.business || l.name || '',
+    contact: l.contact || l.name || '',
+    phone: l.phone || '',
+    email: l.email || '',
+    city: l.city || '',
+    arcade: (l.arcade || '').replace(/[^a-zA-Z ]/g, '').trim(),
+    operator: l.operator || '',
+    notes: l.notes || '',
+    status: l.status || 'new',
+    contactMethod: l.contactMethod || 'in-person',
+    contactedDate: l.contactedDate || l.createdDate || todayStr(),
+    followUpDays: l.followUpDays || 60,
+    followUpDate: l.followUpDate || l.followup || '',
+    value: l.value || '',
+    product: l.product || '',
+    activity: l.activity || [],
+    created: l.created || Date.now(),
+  };
+  // Map old statuses
+  if (out.status === 'won') out.status = 'signed';
+  if (out.status === 'lost') out.status = 'not-interested';
+  if (out.status === 'quoted') out.status = 'follow-up';
+  // Calculate followUpDate if missing
+  if (!out.followUpDate && out.contactedDate) {
+    out.followUpDate = addDays(out.contactedDate, out.followUpDays);
+  }
+  return out;
+}
+
+// ============ DATE UTILS ============
+function addDays(ds, n) {
+  const d = new Date(ds + 'T12:00:00');
+  d.setDate(d.getDate() + parseInt(n));
+  return d.toISOString().split('T')[0];
+}
+
+function daysUntil(ds) {
+  if (!ds) return 999;
+  const t = new Date(); t.setHours(0,0,0,0);
+  const d = new Date(ds + 'T12:00:00'); d.setHours(0,0,0,0);
+  return Math.round((d - t) / 86400000);
+}
+
+function weekRange() {
+  const now = new Date();
+  const day = now.getDay();
+  const mon = new Date(now);
+  mon.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+  mon.setHours(0,0,0,0);
+  const sun = new Date(mon);
+  sun.setDate(mon.getDate() + 6);
+  sun.setHours(23,59,59,999);
+  return [mon, sun];
+}
+
+function monthRange() {
+  const n = new Date();
+  return [new Date(n.getFullYear(), n.getMonth(), 1), new Date(n.getFullYear(), n.getMonth()+1, 0, 23,59,59)];
+}
+
+function inRange(ds, [s, e]) {
+  const x = new Date(ds + 'T12:00:00');
+  return x >= s && x <= e;
+}
+
+function fmtDate(ds) {
+  if (!ds) return '';
+  return new Date(ds + 'T12:00:00').toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+}
+
+function fmtShort(ds) {
+  if (!ds) return '';
+  const p = ds.split('-');
+  return parseInt(p[1]) + '/' + parseInt(p[2]);
+}
+
+function groupByDay(arr) {
+  const m = {};
+  arr.forEach(l => { const d = l.contactedDate || ''; if (!m[d]) m[d] = []; m[d].push(l); });
+  return Object.entries(m).sort((a,b) => b[0].localeCompare(a[0]));
+}
+
+// ============ TOAST ============
+function showToast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2500);
+}
+
+// ============ HTML HELPERS ============
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function statusPill(status) {
+  const s = STATUS_MAP[status] || STATUS_MAP['new'];
+  return `<span class="pill" style="background:${s.bg};color:${s.color}">${esc(s.label)}</span>`;
+}
+
+function followBadge(date) {
+  if (!date) return '';
+  const d = daysUntil(date);
+  if (d < 0) return `<span class="badge badge-overdue">OVERDUE ${Math.abs(d)}d</span>`;
+  if (d === 0) return `<span class="badge badge-today">TODAY</span>`;
+  if (d <= 7) return `<span class="badge badge-soon">IN ${d}d</span>`;
+  if (d <= 14) return `<span class="badge badge-soon" style="opacity:0.7">IN ${d}d</span>`;
+  return `<span class="badge badge-ok">${d}d</span>`;
+}
+
+function methodIcon(val) {
+  const m = METHODS.find(x => x.value === val);
+  return m ? m.icon : '';
+}
+
+function methodLabel(val) {
+  const m = METHODS.find(x => x.value === val);
+  return m ? m.label : '';
+}
+
+// ============ COMPUTED ============
+function getWeekLeads() { const [s,e] = weekRange(); return leads.filter(l => inRange(l.contactedDate, [s,e])); }
+function getMonthLeads() { const [s,e] = monthRange(); return leads.filter(l => inRange(l.contactedDate, [s,e])); }
+
+function getOverdueCount() {
+  return leads.filter(l => daysUntil(l.followUpDate) < 0 && !['signed','not-interested','won','lost'].includes(l.status)).length;
+}
+function getDueSoonCount() {
+  return leads.filter(l => { const d = daysUntil(l.followUpDate); return d >= 0 && d <= 7 && !['signed','not-interested','won','lost'].includes(l.status); }).length;
+}
+function getPipelineValue() {
+  return leads.filter(l => !['signed','not-interested','won','lost'].includes(l.status)).reduce((s,l) => s + (parseFloat(l.value)||0), 0);
+}
+function getTotalValue() {
+  return leads.reduce((s,l) => s + (parseFloat(l.value)||0), 0);
+}
+function getSignedCount() {
+  return leads.filter(l => l.status === 'signed' || l.status === 'won').length;
+}
+function getConversionRate() {
+  if (leads.length === 0) return 0;
+  return Math.round((getSignedCount() / leads.length) * 100);
+}
+
+function getFilteredLeads() {
+  let f = leads;
+  if (filter !== 'all') f = f.filter(l => l.status === filter);
+  if (methodFilter !== 'all') f = f.filter(l => l.contactMethod === methodFilter);
+  if (search) {
+    const q = search.toLowerCase();
+    f = f.filter(l =>
+      (l.business||'').toLowerCase().includes(q) ||
+      (l.contact||'').toLowerCase().includes(q) ||
+      (l.city||'').toLowerCase().includes(q) ||
+      (l.phone||'').toLowerCase().includes(q) ||
+      (l.email||'').toLowerCase().includes(q) ||
+      (l.notes||'').toLowerCase().includes(q) ||
+      (l.operator||'').toLowerCase().includes(q) ||
+      (l.product||'').toLowerCase().includes(q) ||
+      (l.arcade||'').toLowerCase().includes(q)
+    );
+  }
+  f.sort((a,b) => {
+    if (sortBy === 'followup') return new Date(a.followUpDate||'2099') - new Date(b.followUpDate||'2099');
+    if (sortBy === 'newest') return (b.created||0) - (a.created||0);
+    if (sortBy === 'value') return (parseFloat(b.value)||0) - (parseFloat(a.value)||0);
+    if (sortBy === 'business') return (a.business||'').localeCompare(b.business||'');
+    if (sortBy === 'status') return (a.status||'').localeCompare(b.status||'');
+    return 0;
+  });
+  return f;
+}
+
+// ============ ACTIONS ============
+function openNewForm() {
+  editId = null;
+  formData = {
+    business:'', contact:'', phone:'', email:'', city:'', arcade:'',
+    operator:'', notes:'', status:'new', contactMethod:'in-person',
+    contactedDate: todayStr(), followUpDays: 60, value:'', product:'',
+  };
+  showForm = true;
+  render();
+  setTimeout(() => { const el = document.getElementById('f_business'); if (el) el.focus(); }, 100);
+}
+
+function openEditForm(id) {
+  const l = leads.find(x => x.id === id);
+  if (!l) return;
+  editId = id;
+  formData = { ...l };
+  showForm = true;
+  render();
+}
+
+function submitForm() {
+  if (!(formData.business||'').trim()) return;
+  const fup = addDays(formData.contactedDate, formData.followUpDays);
+  if (editId) {
+    const idx = leads.findIndex(x => x.id === editId);
+    if (idx >= 0) {
+      leads[idx] = { ...leads[idx], ...formData, followUpDate: fup };
+    }
+  } else {
+    const now = new Date();
+    leads.unshift({
+      ...formData,
+      id: genId(),
+      followUpDate: fup,
+      created: Date.now(),
+      activity: [{ date: todayStr(), time: now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}), note:'Lead created' }],
+    });
+  }
+  save(); showForm = false; render();
+  showToast(editId ? 'Lead updated' : 'Lead added');
+}
+
+function deleteLead(id) {
+  if (!confirm('Delete this lead?')) return;
+  leads = leads.filter(x => x.id !== id);
+  save(); showForm = false; quickActionId = null; render();
+  showToast('Lead deleted');
+}
+
+function setLeadStatus(id, status) {
+  const l = leads.find(x => x.id === id);
+  if (l) {
+    l.status = status;
+    if (!l.activity) l.activity = [];
+    l.activity.push({ date: todayStr(), time: new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}), note: 'Status changed to ' + (STATUS_MAP[status]||{}).label });
+    save(); render();
+  }
+}
+
+function addActivity(id, note) {
+  const l = leads.find(x => x.id === id);
+  if (!l || !note.trim()) return;
+  if (!l.activity) l.activity = [];
+  l.activity.push({ date: todayStr(), time: new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}), note: note.trim() });
+  save(); render();
+}
+
+function bulkUpdateStatus(status) {
+  bulkSelected.forEach(id => {
+    const l = leads.find(x => x.id === id);
+    if (l) l.status = status;
+  });
+  save();
+  bulkMode = false; bulkSelected.clear(); render();
+  showToast('Updated ' + bulkSelected.size + ' leads');
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(leads, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'leads_backup_' + todayStr() + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Data exported');
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json';
+  input.onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        const arr = JSON.parse(ev.target.result);
+        if (!Array.isArray(arr)) { showToast('Invalid file'); return; }
+        const before = leads.length;
+        const seen = new Set(leads.map(l => l.id));
+        let added = 0;
+        arr.forEach(item => {
+          const norm = migrateLead(item);
+          if (!seen.has(norm.id)) {
+            leads.push(norm);
+            seen.add(norm.id);
+            added++;
+          }
+        });
+        save(); render();
+        showToast('Imported ' + added + ' new leads');
+      } catch(err) { showToast('Error reading file'); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function printReport() {
+  const ml = getMonthLeads();
+  const monthName = new Date().toLocaleDateString('en-US', { month:'long', year:'numeric' });
+  const signed = ml.filter(l => l.status==='signed'||l.status==='won').length;
+  const interested = ml.filter(l => l.status==='interested').length;
+  const followUp = ml.filter(l => l.status==='follow-up'||l.status==='quoted').length;
+  const notInt = ml.filter(l => l.status==='not-interested'||l.status==='lost').length;
+
+  let rowNum = 0;
+  const rows = groupByDay(ml).map(([date, dl]) =>
+    dl.map(l => {
+      rowNum++;
+      const sc = STATUS_MAP[l.status] || STATUS_MAP['new'];
+      return `<tr>
+        <td style="text-align:center;color:#9ca3af">${rowNum}</td>
+        <td>${fmtShort(date)}</td>
+        <td><strong>${esc(l.business)}</strong>${l.city ? '<br><span style="color:#9ca3af;font-size:10px">'+esc(l.city)+'</span>' : ''}</td>
+        <td>${methodIcon(l.contactMethod)} ${methodLabel(l.contactMethod)}</td>
+        <td style="color:${sc.color};font-weight:600">${sc.label}</td>
+        <td>${esc(l.contact)||'--'}</td>
+        <td>${esc(l.phone)||'--'}</td>
+        <td style="color:#b45309">${esc(l.operator)||'--'}</td>
+        <td style="color:#16a34a;font-weight:600">${l.value ? '$'+Number(l.value).toLocaleString() : '--'}</td>
+      </tr>`;
+    }).join('')
+  ).join('');
+
+  const pipeVal = ml.reduce((s,l) => s + (parseFloat(l.value)||0), 0);
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Monthly Sales Report - ${monthName}</title>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:11px;color:#111;padding:20px;max-width:1000px;margin:0 auto}
+.header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px;padding-bottom:12px;border-bottom:3px solid #ea580c}
+h1{font-size:18px;color:#ea580c;margin-bottom:2px}.sub{color:#6b7280;font-size:10px}
+.stats{display:flex;gap:10px;margin-bottom:16px}.stat{flex:1;border:1px solid #e5e7eb;border-radius:6px;padding:8px;text-align:center}
+.stat .n{font-size:22px;font-weight:900}.stat .l{font-size:9px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.methods{display:flex;gap:10px;margin-bottom:16px}.mbox{flex:1;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:8px;text-align:center}
+.mbox .mn{font-size:18px;font-weight:900;color:#ea580c}.mbox .ml{font-size:9px;color:#9a3412;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+h2{font-size:11px;color:#374151;border-bottom:2px solid #ea580c;padding-bottom:3px;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px}
+table{width:100%;border-collapse:collapse;font-size:10px}th{background:#1f2937;color:#fff;padding:6px 7px;text-align:left;font-size:9px;letter-spacing:1px;text-transform:uppercase}
+td{padding:5px 7px;border-bottom:1px solid #f3f4f6;vertical-align:middle}tr:nth-child(even) td{background:#f9fafb}
+.footer{margin-top:16px;color:#9ca3af;font-size:9px;display:flex;justify-content:space-between;border-top:1px solid #e5e7eb;padding-top:8px}
+@media print{body{padding:10px}@page{margin:12mm;size:landscape}}</style></head>
+<body><div class="header"><div><h1>Monthly Sales Report</h1><div class="sub">Central California -- Amusement & Vending Sales</div></div>
+<div style="text-align:right;color:#6b7280;font-size:10px"><strong style="font-size:13px;color:#111">${monthName}</strong><br>Printed ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div></div>
+<div class="stats">
+<div class="stat"><div class="n" style="color:#ea580c">${ml.length}</div><div class="l">Total Leads</div></div>
+<div class="stat"><div class="n" style="color:#16a34a">${signed}</div><div class="l">Signed</div></div>
+<div class="stat"><div class="n" style="color:#0891b2">${interested}</div><div class="l">Interested</div></div>
+<div class="stat"><div class="n" style="color:#d97706">${followUp}</div><div class="l">Follow Up</div></div>
+<div class="stat"><div class="n" style="color:#dc2626">${notInt}</div><div class="l">Not Interested</div></div>
+<div class="stat"><div class="n" style="color:#16a34a">$${pipeVal.toLocaleString()}</div><div class="l">Pipeline Value</div></div>
+</div>
+<div class="methods">${METHODS.map(m => `<div class="mbox"><div style="font-size:16px">${m.icon}</div><div class="mn">${ml.filter(l=>l.contactMethod===m.value).length}</div><div class="ml">${m.label}</div></div>`).join('')}</div>
+<h2>All Locations - ${ml.length} Total</h2>
+<table><thead><tr><th>#</th><th>Date</th><th>Business</th><th>Method</th><th>Status</th><th>Contact</th><th>Phone</th><th>Operator</th><th>Value</th></tr></thead><tbody>${rows}</tbody></table>
+<div class="footer"><span>West Coast Amusement -- Lead Tracker</span><span>Generated ${new Date().toLocaleString()}</span></div>
+<script>window.onload=function(){window.print();}<\/script></body></html>`;
+
+  const w = window.open('','_blank');
+  if (w) { w.document.write(html); w.document.close(); }
+  else { alert('Allow pop-ups to print.'); }
+}
+
+// ============ RENDER ============
+function render() {
+  const app = document.getElementById('app');
+  let h = '';
+
+  // Header
+  h += `<div class="header">
+    <div class="header-top">
+      <div>
+        <div class="header-title"><span>Lead</span> Tracker</div>
+        <div class="header-subtitle">Central California &mdash; Amusement &amp; Vending</div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="showSettings=true;render()" title="Settings">&#9881;</button>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab ${tab==='leads'?'active':''}" onclick="tab='leads';render()">Leads</button>
+      <button class="tab ${tab==='week'?'active':''}" onclick="tab='week';render()">Week</button>
+      <button class="tab ${tab==='month'?'active':''}" onclick="tab='month';render()">Month</button>
+    </div>
+  </div>`;
+
+  // TAB: LEADS
+  if (tab === 'leads') {
+    h += renderDashboard();
+    h += renderControls();
+    h += renderLeadCards();
+  }
+
+  // TAB: WEEK
+  if (tab === 'week') {
+    h += renderWeekView();
+  }
+
+  // TAB: MONTH
+  if (tab === 'month') {
+    h += renderMonthView();
+  }
+
+  // FAB
+  h += `<button class="fab" onclick="openNewForm()">+</button>`;
+
+  // Form Modal
+  if (showForm) {
+    h += renderFormModal();
+  }
+
+  // Quick actions
+  if (quickActionId) {
+    h += renderQuickActions();
+  }
+
+  // Settings
+  if (showSettings) {
+    h += renderSettingsSheet();
+  }
+
+  // Bulk bar
+  if (bulkMode && bulkSelected.size > 0) {
+    h += renderBulkBar();
+  }
+
+  app.innerHTML = h;
+  bindEvents();
+}
+
+function renderDashboard() {
+  const wl = getWeekLeads();
+  const pct = Math.min((wl.length / WEEKLY_GOAL) * 100, 100);
+  const goalMet = wl.length >= WEEKLY_GOAL;
+
+  return `<div class="dashboard">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-value" style="color:var(--red)">${getOverdueCount()}</div><div class="stat-label">Overdue</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--accent)">${getDueSoonCount()}</div><div class="stat-label">Due 7d</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--green)">${getSignedCount()}</div><div class="stat-label">Signed</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--text-secondary)">${leads.length}</div><div class="stat-label">Total</div></div>
+    </div>
+    <div class="pipeline-row">
+      <div class="pipeline-card"><div class="pipeline-value" style="color:var(--green)">$${getPipelineValue().toLocaleString()}</div><div class="pipeline-label">Pipeline Value</div></div>
+      <div class="pipeline-card"><div class="pipeline-value" style="color:var(--accent)">${getConversionRate()}%</div><div class="pipeline-label">Conversion Rate</div></div>
+    </div>
+    <div class="goal-bar">
+      <div class="goal-header">
+        <span class="goal-label">Weekly Goal</span>
+        <span class="goal-count" style="color:${goalMet?'var(--green)':'var(--accent)'}">${wl.length} / ${WEEKLY_GOAL}</span>
+      </div>
+      <div class="goal-track"><div class="goal-fill" style="width:${pct}%;background:${goalMet?'var(--green)':'var(--accent)'}"></div></div>
+      <div class="goal-hint">${goalMet ? 'Goal met -- great week!' : (WEEKLY_GOAL - wl.length) + ' more to hit your goal'}</div>
+    </div>
+  </div>`;
+}
+
+function renderControls() {
+  const statuses = ['all','new','contacted','interested','follow-up','signed','not-interested'];
+  return `<div class="controls">
+    <div class="search-row">
+      <div class="search-wrap">
+        <span class="search-icon">&#128269;</span>
+        <input class="search-input" id="searchInput" type="text" placeholder="Search all fields..." value="${esc(search)}" autocomplete="off">
+      </div>
+      <select class="sort-select" id="sortSelect">
+        <option value="followup" ${sortBy==='followup'?'selected':''}>Follow-Up</option>
+        <option value="newest" ${sortBy==='newest'?'selected':''}>Newest</option>
+        <option value="value" ${sortBy==='value'?'selected':''}>Value</option>
+        <option value="business" ${sortBy==='business'?'selected':''}>Name</option>
+        <option value="status" ${sortBy==='status'?'selected':''}>Status</option>
+      </select>
+    </div>
+    <div class="filter-row">
+      ${statuses.map(s => {
+        const label = s === 'all' ? 'All' : (STATUS_MAP[s]||{}).label || s;
+        return `<button class="filter-pill ${filter===s?'active':''}" data-filter="${s}">${label}</button>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function renderLeadCards() {
+  const filtered = getFilteredLeads();
+  if (filtered.length === 0) {
+    return `<div class="leads-container"><div class="empty"><div class="empty-icon">&#128203;</div><div class="empty-text">${leads.length===0?'No leads yet -- tap + to add one':'No results match your search'}</div></div></div>`;
+  }
+  let h = `<div class="leads-container">`;
+  if (bulkMode) {
+    h += `<div class="section-label">${filtered.length} leads -- tap to select</div>`;
+  }
+  filtered.forEach(l => {
+    const sc = STATUS_MAP[l.status] || STATUS_MAP['new'];
+    const m = METHODS.find(x => x.value === l.contactMethod);
+    const checked = bulkSelected.has(l.id);
+    h += `<div class="lead-card" ${bulkMode ? `onclick="toggleBulk('${l.id}')"` : `onclick="openEditForm('${l.id}')"` } oncontextmenu="event.preventDefault();quickActionId='${l.id}';render()">
+      <div class="lead-card-accent" style="background:${sc.color}"></div>
+      <div class="lead-top">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px">
+            ${bulkMode ? `<div class="lead-check ${checked?'checked':''}">${checked?'&#10003;':''}</div>` : ''}
+            <div class="lead-business">${esc(l.business)}</div>
+          </div>
+          ${l.city ? `<div class="lead-city">${esc(l.city)}</div>` : ''}
+        </div>
+        ${followBadge(l.followUpDate)}
+      </div>
+      <div class="lead-pills">
+        ${statusPill(l.status)}
+        ${l.arcade ? `<span class="pill" style="background:var(--purple-dim);color:var(--purple)">${esc(l.arcade)}</span>` : ''}
+        ${m ? `<span class="pill" style="background:rgba(255,255,255,0.05);color:var(--text-dim)">${m.icon} ${m.label}</span>` : ''}
+        ${l.value ? `<span class="pill" style="background:var(--green-dim);color:var(--green)">$${Number(l.value).toLocaleString()}</span>` : ''}
+      </div>
+      <div class="lead-info">
+        ${l.contact ? `<span>&#128100; ${esc(l.contact)}</span>` : ''}
+        ${l.phone ? `<a href="tel:${esc(l.phone)}" onclick="event.stopPropagation()">&#128222; ${esc(l.phone)}</a>` : ''}
+        ${l.email ? `<a href="mailto:${esc(l.email)}" onclick="event.stopPropagation()">&#9993; ${esc(l.email)}</a>` : ''}
+        ${l.product ? `<span>&#127919; ${esc(l.product)}</span>` : ''}
+      </div>
+      ${l.operator ? `<div class="lead-operator">&#9888; Current operator: <strong>${esc(l.operator)}</strong></div>` : ''}
+      ${l.notes ? `<div class="lead-notes-preview">${esc(l.notes)}</div>` : ''}
+    </div>`;
+  });
+  h += `</div>`;
+  return h;
+}
+
+function renderQuickActions() {
+  const l = leads.find(x => x.id === quickActionId);
+  if (!l) return '';
+  const statusKeys = Object.keys(STATUS_MAP);
+  return `<div class="quick-actions-overlay open" onclick="if(event.target===this){quickActionId=null;render()}">
+    <div class="quick-actions">
+      <div class="quick-actions-handle"></div>
+      <div class="quick-actions-title">${esc(l.business)}</div>
+      ${l.phone ? `<a class="qa-btn" href="tel:${esc(l.phone)}" style="text-decoration:none;color:var(--text)"><div class="qa-icon" style="background:var(--green-dim)">&#128222;</div>Call ${esc(l.phone)}</a>` : ''}
+      ${l.email ? `<a class="qa-btn" href="mailto:${esc(l.email)}" style="text-decoration:none;color:var(--text)"><div class="qa-icon" style="background:var(--blue-dim)">&#9993;</div>Email ${esc(l.email)}</a>` : ''}
+      <button class="qa-btn" onclick="quickActionId=null;openEditForm('${l.id}')"><div class="qa-icon" style="background:var(--accent-dim)">&#9998;</div>Edit Lead</button>
+      <div style="padding:8px 0 4px;font-size:11px;color:var(--text-dim);letter-spacing:1px">CHANGE STATUS</div>
+      ${statusKeys.map(k => {
+        const s = STATUS_MAP[k];
+        const isCurrent = l.status === k;
+        return `<button class="qa-btn" onclick="setLeadStatus('${l.id}','${k}');quickActionId=null;render()" style="${isCurrent?'opacity:0.4':''}">
+          <div class="qa-icon" style="background:${s.bg}"><span style="color:${s.color};font-size:12px">&#9679;</span></div>${s.label}${isCurrent?' (current)':''}
+        </button>`;
+      }).join('')}
+      <button class="qa-btn danger" onclick="deleteLead('${l.id}')"><div class="qa-icon" style="background:var(--red-dim)">&#128465;</div>Delete Lead</button>
+    </div>
+  </div>`;
+}
+
+function renderFormModal() {
+  const isEdit = !!editId;
+  const lead = isEdit ? leads.find(x => x.id === editId) : null;
+  const fupDate = addDays(formData.contactedDate || todayStr(), formData.followUpDays || 60);
+
+  let activityHtml = '';
+  if (isEdit && lead) {
+    const acts = (lead.activity || []).slice().reverse();
+    activityHtml = `<div class="activity-section">
+      <label class="form-label">Activity Log</label>
+      <div class="activity-log">${acts.length === 0 ? '<div style="font-size:12px;color:var(--text-dim);padding:6px">No activity yet</div>' :
+        acts.map(a => `<div class="activity-entry"><div class="activity-date">${fmtShort(a.date)} ${a.time||''}</div><div class="activity-note">${esc(a.note)}</div></div>`).join('')
+      }</div>
+      <div class="activity-add">
+        <input class="form-input" id="activityNote" placeholder="Add a note..." style="padding:10px 12px">
+        <button class="activity-add-btn" onclick="addActivityFromForm()">Add</button>
+      </div>
+    </div>`;
+  }
+
+  return `<div class="modal-overlay open" onclick="if(event.target===this){showForm=false;render()}">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <div class="modal-title">${isEdit ? 'Edit Lead' : 'New Lead'}</div>
+        <button class="modal-close" onclick="showForm=false;render()">&times;</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Business Name *</label>
+        <input class="form-input" id="f_business" value="${esc(formData.business)}" placeholder="Pizza Palace" oninput="formData.business=this.value">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Contact Name</label>
+          <input class="form-input" id="f_contact" value="${esc(formData.contact)}" placeholder="John Smith" oninput="formData.contact=this.value">
+        </div>
+        <div class="form-group">
+          <label class="form-label">City</label>
+          <input class="form-input" id="f_city" value="${esc(formData.city)}" placeholder="Fresno, CA" oninput="formData.city=this.value">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input class="form-input" id="f_phone" type="tel" value="${esc(formData.phone)}" placeholder="(559) 555-1234" oninput="formData.phone=this.value">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" id="f_email" type="email" value="${esc(formData.email)}" placeholder="owner@biz.com" oninput="formData.email=this.value">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Est. Value ($)</label>
+          <input class="form-input" id="f_value" type="number" value="${formData.value||''}" placeholder="0" min="0" step="100" oninput="formData.value=this.value">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Product Interest</label>
+          <input class="form-input" id="f_product" value="${esc(formData.product)}" placeholder="Crane, stickers..." oninput="formData.product=this.value">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Arcade Status</label>
+        <select class="form-input" id="f_arcade" onchange="formData.arcade=this.value">
+          ${ARCADE_OPTIONS.map(o => `<option value="${esc(o.v)}" ${formData.arcade===o.v?'selected':''}>${esc(o.l)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label highlight">Current Operator / Competitor</label>
+        <input class="form-input" id="f_operator" value="${esc(formData.operator)}" placeholder="Bar Partners, Amuze, none..." oninput="formData.operator=this.value" style="border-color:rgba(234,179,8,0.2)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contact Method</label>
+        <div class="method-btns">
+          ${METHODS.map(m => `<button type="button" class="method-btn ${formData.contactMethod===m.value?'active':''}" onclick="formData.contactMethod='${m.value}';render()">${m.icon} ${m.label}</button>`).join('')}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-input" id="f_status" onchange="formData.status=this.value">
+            ${Object.entries(STATUS_MAP).filter(([k]) => !['won','lost','quoted'].includes(k)).map(([k,v]) => `<option value="${k}" ${formData.status===k?'selected':''}>${v.label}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Follow Up In</label>
+          <select class="form-input" id="f_fupdays" onchange="formData.followUpDays=parseInt(this.value);updateFupPreview()">
+            ${[7,14,30,45,60,75,90,120].map(d => `<option value="${d}" ${formData.followUpDays==d?'selected':''}>${d} days</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date Contacted</label>
+        <input class="form-input" id="f_contacted" type="date" value="${formData.contactedDate||todayStr()}" onchange="formData.contactedDate=this.value;updateFupPreview()">
+        <div class="followup-calc" id="fupPreview">Follow-up on: <strong>${fupDate}</strong></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-input" id="f_notes" placeholder="Details about this lead..." oninput="formData.notes=this.value">${esc(formData.notes)}</textarea>
+      </div>
+      ${activityHtml}
+      <button class="btn-primary" onclick="submitForm()" ${!(formData.business||'').trim()?'disabled':''}>${isEdit ? 'Save Changes' : 'Add Lead'}</button>
+      ${isEdit ? `<button class="btn-danger" onclick="deleteLead('${editId}')">Delete Lead</button>` : ''}
+    </div>
+  </div>`;
+}
+
+function renderWeekView() {
+  const wl = getWeekLeads();
+  const [wS, wE] = weekRange();
+  const pct = Math.min((wl.length / WEEKLY_GOAL) * 100, 100);
+  const goalMet = wl.length >= WEEKLY_GOAL;
+
+  let h = `<div class="view-container">
+    <div class="section-label">WEEK OF ${wS.toLocaleDateString('en-US',{month:'short',day:'numeric'})} -- ${wE.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
+    <div class="goal-bar" style="margin-bottom:16px">
+      <div class="goal-header">
+        <span class="goal-label">Goal Progress</span>
+        <span class="goal-count" style="color:${goalMet?'var(--green)':'var(--accent)'}">${wl.length} / ${WEEKLY_GOAL}</span>
+      </div>
+      <div class="goal-track"><div class="goal-fill" style="width:${pct}%;background:${goalMet?'var(--green)':'var(--accent)'}"></div></div>
+      <div class="goal-hint">${goalMet ? 'Goal met -- great week!' : (WEEKLY_GOAL - wl.length) + ' more leads needed'}</div>
+    </div>
+    <div class="section-label">By Method</div>
+    <div class="method-grid">
+      ${METHODS.map(m => `<div class="method-card">
+        <div class="method-card-icon">${m.icon}</div>
+        <div class="method-card-count">${wl.filter(l=>l.contactMethod===m.value).length}</div>
+        <div class="method-card-label">${m.label}</div>
+      </div>`).join('')}
+    </div>
+    <div class="section-label">Daily Log -- ${wl.length} Leads</div>`;
+
+  if (wl.length === 0) {
+    h += `<div style="color:var(--text-dim);font-size:13px;padding:20px 0">No leads logged this week yet.</div>`;
+  } else {
+    groupByDay(wl).forEach(([date, dl]) => {
+      h += `<div class="day-group"><div class="day-label">${fmtDate(date)} -- ${dl.length} lead${dl.length!==1?'s':''}</div>`;
+      dl.forEach(l => {
+        const sc = STATUS_MAP[l.status] || STATUS_MAP['new'];
+        h += `<div class="day-card" onclick="openEditForm('${l.id}')">
+          <div><div class="day-card-name">${esc(l.business)}</div>
+          <div class="day-card-detail">${esc(l.city)} &middot; ${methodIcon(l.contactMethod)} ${methodLabel(l.contactMethod)} &middot; <span style="color:${sc.color}">${sc.label}</span>${l.operator?' &middot; '+esc(l.operator):''}</div></div>
+          ${followBadge(l.followUpDate)}
+        </div>`;
+      });
+      h += `</div>`;
+    });
+  }
+  h += `</div>`;
+  return h;
+}
+
+function renderMonthView() {
+  const ml = getMonthLeads();
+  const [mS] = monthRange();
+  const monthName = new Date().toLocaleDateString('en-US', { month:'long', year:'numeric' });
+
+  let h = `<div class="view-container">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div class="section-label" style="margin:0">${monthName.toUpperCase()}</div>
+      <button class="print-btn" onclick="printReport()">&#128424; Print Report</button>
+    </div>
+    <div class="stats-grid" style="margin-bottom:16px">
+      <div class="stat-card"><div class="stat-value" style="color:var(--accent)">${ml.length}</div><div class="stat-label">Total</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--green)">${ml.filter(l=>l.status==='signed'||l.status==='won').length}</div><div class="stat-label">Signed</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--blue)">${ml.filter(l=>l.status==='interested').length}</div><div class="stat-label">Interested</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--yellow)">${ml.filter(l=>l.status==='follow-up'||l.status==='quoted').length}</div><div class="stat-label">Follow Up</div></div>
+    </div>
+    <div class="section-label">By Method</div>
+    <div class="method-grid" style="margin-bottom:16px">
+      ${METHODS.map(m => `<div class="method-card">
+        <div class="method-card-icon">${m.icon}</div>
+        <div class="method-card-count">${ml.filter(l=>l.contactMethod===m.value).length}</div>
+        <div class="method-card-label">${m.label}</div>
+      </div>`).join('')}
+    </div>
+    <div class="section-label">Weekly Pace (${WEEKLY_GOAL}/week goal)</div>`;
+
+  for (let w = 0; w < 5; w++) {
+    const ws = new Date(mS); ws.setDate(mS.getDate() + w * 7);
+    const we = new Date(ws); we.setDate(ws.getDate() + 6);
+    if (ws.getMonth() !== mS.getMonth() && w > 0) break;
+    const wc = ml.filter(l => inRange(l.contactedDate, [ws, we])).length;
+    const pp = Math.min((wc / WEEKLY_GOAL) * 100, 100);
+    h += `<div class="pace-bar">
+      <div class="pace-header"><span>Week ${w+1}: ${ws.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span><span style="color:${wc>=WEEKLY_GOAL?'var(--green)':'var(--accent)'};font-weight:700">${wc}/${WEEKLY_GOAL}</span></div>
+      <div class="pace-track"><div class="pace-fill" style="width:${pp}%;background:${wc>=WEEKLY_GOAL?'var(--green)':'var(--accent)'}"></div></div>
+    </div>`;
+  }
+
+  h += `<div class="section-label" style="margin-top:16px">Full Log -- ${ml.length} Leads</div>`;
+  if (ml.length === 0) {
+    h += `<div style="color:var(--text-dim);font-size:13px;padding:20px 0">No leads logged this month yet.</div>`;
+  } else {
+    groupByDay(ml).forEach(([date, dl]) => {
+      h += `<div class="day-group"><div class="day-label">${fmtDate(date)} -- ${dl.length} lead${dl.length!==1?'s':''}</div>`;
+      dl.forEach(l => {
+        const sc = STATUS_MAP[l.status] || STATUS_MAP['new'];
+        h += `<div class="day-card" onclick="openEditForm('${l.id}')">
+          <div><div class="day-card-name">${esc(l.business)}</div>
+          <div class="day-card-detail">${esc(l.city)} &middot; ${methodIcon(l.contactMethod)} ${methodLabel(l.contactMethod)} &middot; <span style="color:${sc.color}">${sc.label}</span>${l.value?' &middot; $'+Number(l.value).toLocaleString():''}</div></div>
+          ${followBadge(l.followUpDate)}
+        </div>`;
+      });
+      h += `</div>`;
+    });
+  }
+  h += `</div>`;
+  return h;
+}
+
+function renderSettingsSheet() {
+  return `<div class="settings-overlay open" onclick="if(event.target===this){showSettings=false;render()}">
+    <div class="settings-sheet">
+      <div class="modal-handle"></div>
+      <div style="font-size:18px;font-weight:700;padding:4px 0 16px">Settings</div>
+      <div class="settings-item" onclick="exportData();showSettings=false;render()">
+        <div class="settings-icon">&#128230;</div>
+        <div class="settings-label">Export Data<small>Download all leads as JSON</small></div>
+      </div>
+      <div class="settings-item" onclick="showSettings=false;render();importData()">
+        <div class="settings-icon">&#128229;</div>
+        <div class="settings-label">Import Data<small>Load leads from a JSON backup</small></div>
+      </div>
+      <div class="settings-item" onclick="bulkMode=!bulkMode;bulkSelected.clear();showSettings=false;render()">
+        <div class="settings-icon">&#9745;</div>
+        <div class="settings-label">${bulkMode?'Exit':'Enter'} Bulk Edit<small>Select multiple leads to update</small></div>
+      </div>
+      <div class="settings-item" onclick="if(confirm('Clear ALL data? This cannot be undone.')){leads=[];save();showSettings=false;render();showToast('All data cleared')}">
+        <div class="settings-icon">&#128465;</div>
+        <div class="settings-label" style="color:var(--red)">Clear All Data<small>Delete everything permanently</small></div>
+      </div>
+      <div style="padding:16px 0 0;font-size:11px;color:var(--text-dim);text-align:center">Lead Tracker v2.0 &middot; ${leads.length} leads stored</div>
+    </div>
+  </div>`;
+}
+
+function renderBulkBar() {
+  return `<div class="bulk-bar active">
+    <div class="bulk-count">${bulkSelected.size} selected</div>
+    <select class="bulk-btn" id="bulkStatusSelect" style="background:var(--accent);color:#000;font-weight:600" onchange="if(this.value){bulkUpdateStatus(this.value);this.value=''}">
+      <option value="">Set Status...</option>
+      ${Object.entries(STATUS_MAP).filter(([k]) => !['won','lost','quoted'].includes(k)).map(([k,v]) => `<option value="${k}">${v.label}</option>`).join('')}
+    </select>
+    <button class="bulk-btn" style="background:var(--bg-card);color:var(--text)" onclick="bulkMode=false;bulkSelected.clear();render()">Cancel</button>
+  </div>`;
+}
+
+// ============ EVENT BINDING ============
+function bindEvents() {
+  const si = document.getElementById('searchInput');
+  if (si) {
+    si.oninput = function() { search = this.value; render(); };
+    // Restore cursor position
+    if (document.activeElement && document.activeElement.id === 'searchInput') {
+      // Already focused
+    }
+  }
+  const ss = document.getElementById('sortSelect');
+  if (ss) ss.onchange = function() { sortBy = this.value; render(); };
+
+  document.querySelectorAll('.filter-pill').forEach(btn => {
+    btn.onclick = function() { filter = this.dataset.filter; render(); };
+  });
+
+  // Keep focus on search if it was focused
+  if (search && si) {
+    si.focus();
+    si.setSelectionRange(si.value.length, si.value.length);
+  }
+}
+
+// Global helpers for inline handlers
+window.openNewForm = openNewForm;
+window.openEditForm = openEditForm;
+window.submitForm = submitForm;
+window.deleteLead = deleteLead;
+window.setLeadStatus = setLeadStatus;
+window.addActivityFromForm = function() {
+  const input = document.getElementById('activityNote');
+  if (input && editId) { addActivity(editId, input.value); }
+};
+window.updateFupPreview = function() {
+  const el = document.getElementById('fupPreview');
+  if (el) {
+    const d = addDays(formData.contactedDate || todayStr(), formData.followUpDays || 60);
+    el.innerHTML = 'Follow-up on: <strong>' + d + '</strong>';
+  }
+};
+window.toggleBulk = function(id) {
+  if (bulkSelected.has(id)) bulkSelected.delete(id); else bulkSelected.add(id);
+  render();
+};
+window.bulkUpdateStatus = function(status) {
+  const count = bulkSelected.size;
+  bulkSelected.forEach(id => {
+    const l = leads.find(x => x.id === id);
+    if (l) l.status = status;
+  });
+  save();
+  bulkMode = false; bulkSelected.clear(); render();
+  showToast('Updated ' + count + ' leads');
+};
+window.printReport = printReport;
+window.exportData = exportData;
+window.importData = importData;
+window.showToast = showToast;
+
+// ============ INIT ============
+load();
+render();
+</script>
+</body>
+</html>
