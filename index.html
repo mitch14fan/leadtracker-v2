@@ -30,6 +30,8 @@
   --blue-dim: rgba(59,130,246,0.12);
   --purple: #818cf8;
   --purple-dim: rgba(129,140,248,0.12);
+  --orange: #fb923c;
+  --orange-dim: rgba(251,146,60,0.12);
   --text: #f0f0f0;
   --text-secondary: #a1a1aa;
   --text-dim: #71717a;
@@ -435,12 +437,14 @@ const METHODS = [
   { value:'text',      label:'Text',      icon:'\uD83D\uDCAC' },
 ];
 
-const ARCADE_OPTIONS = [
-  { v:'', l:'-- None --' },
-  { v:'Broken Arcade',  l:'Broken Arcade' },
-  { v:'Has Arcade',     l:'Has Arcade' },
-  { v:'No Arcade',      l:'No Arcade' },
-  { v:'Wants Games',    l:'Wants Games' },
+const EQUIPMENT_OPTIONS = [
+  { v:'Has Arcade',     l:'🕹️ Arcade',      color:'--purple' },
+  { v:'Jukebox',        l:'🎵 Jukebox',     color:'--blue' },
+  { v:'ATM',            l:'🏧 ATM',          color:'--green' },
+  { v:'Pool Table',     l:'🎱 Pool Table',   color:'--yellow' },
+  { v:'Dart Board',     l:'🎯 Darts',        color:'--red' },
+  { v:'Broken Arcade',  l:'🔧 Broken Arcade',color:'--orange' },
+  { v:'Wants Games',    l:'⭐ Wants Games',  color:'--accent' },
 ];
 
 // ============ STATE ============
@@ -507,7 +511,7 @@ function migrateLead(l) {
     phone: l.phone || '',
     email: l.email || '',
     city: l.city || '',
-    arcade: (l.arcade || '').replace(/[^a-zA-Z ]/g, '').trim(),
+    equipment: Array.isArray(l.equipment) ? l.equipment : (l.arcade ? [l.arcade.replace(/[^a-zA-Z ]/g, '').trim()].filter(Boolean) : []),
     operator: l.operator || '',
     notes: l.notes || '',
     status: l.status || 'new',
@@ -661,7 +665,7 @@ function getFilteredLeads() {
       (l.notes||'').toLowerCase().includes(q) ||
       (l.operator||'').toLowerCase().includes(q) ||
       (l.product||'').toLowerCase().includes(q) ||
-      (l.arcade||'').toLowerCase().includes(q)
+      (l.equipment||[]).join(' ').toLowerCase().includes(q)
     );
   }
   f.sort((a,b) => {
@@ -676,10 +680,18 @@ function getFilteredLeads() {
 }
 
 // ============ ACTIONS ============
+function toggleEquip(val) {
+  if (!formData.equipment) formData.equipment = [];
+  const idx = formData.equipment.indexOf(val);
+  if (idx >= 0) formData.equipment.splice(idx, 1);
+  else formData.equipment.push(val);
+  render();
+}
+
 function openNewForm() {
   editId = null;
   formData = {
-    business:'', contact:'', phone:'', email:'', city:'', arcade:'',
+    business:'', contact:'', phone:'', email:'', city:'', equipment:[],
     operator:'', notes:'', status:'new', contactMethod:'in-person',
     contactedDate: todayStr(), followUpDays: 60, value:'', product:'',
   };
@@ -1006,7 +1018,7 @@ function renderLeadCards() {
       </div>
       <div class="lead-pills">
         ${statusPill(l.status)}
-        ${l.arcade ? `<span class="pill" style="background:var(--purple-dim);color:var(--purple)">${esc(l.arcade)}</span>` : ''}
+        ${(l.equipment||[]).map(eq => { const opt = EQUIPMENT_OPTIONS.find(o=>o.v===eq); const c = opt ? opt.color : '--purple'; return `<span class="pill" style="background:var(${c}-dim);color:var(${c})">${esc(eq)}</span>`; }).join('')}
         ${m ? `<span class="pill" style="background:rgba(255,255,255,0.05);color:var(--text-dim)">${m.icon} ${m.label}</span>` : ''}
         ${l.value ? `<span class="pill" style="background:var(--green-dim);color:var(--green)">$${Number(l.value).toLocaleString()}</span>` : ''}
       </div>
@@ -1110,10 +1122,10 @@ function renderFormModal() {
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Arcade Status</label>
-        <select class="form-input" id="f_arcade" onchange="formData.arcade=this.value">
-          ${ARCADE_OPTIONS.map(o => `<option value="${esc(o.v)}" ${formData.arcade===o.v?'selected':''}>${esc(o.l)}</option>`).join('')}
-        </select>
+        <label class="form-label">Equipment On-Site</label>
+        <div class="method-btns" style="flex-wrap:wrap;gap:6px">
+          ${EQUIPMENT_OPTIONS.map(o => `<button type="button" class="method-btn ${(formData.equipment||[]).includes(o.v)?'active':''}" style="${(formData.equipment||[]).includes(o.v)?'background:var(--accent);color:#000':''}" onclick="toggleEquip('${o.v}')">${o.l}</button>`).join('')}
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label highlight">Current Operator / Competitor</label>
