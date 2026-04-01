@@ -1089,36 +1089,36 @@ function renderFormModal() {
       </div>
       <div class="form-group">
         <label class="form-label">Business Name *</label>
-        <input class="form-input" id="f_business" value="${esc(formData.business)}" placeholder="Pizza Palace" oninput="formData.business=this.value">
+        <input class="form-input" id="f_business" value="${esc(formData.business)}" placeholder="" oninput="formData.business=this.value">
       </div>
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Contact Name</label>
-          <input class="form-input" id="f_contact" value="${esc(formData.contact)}" placeholder="John Smith" oninput="formData.contact=this.value">
+          <input class="form-input" id="f_contact" value="${esc(formData.contact)}" placeholder="" oninput="formData.contact=this.value">
         </div>
         <div class="form-group">
           <label class="form-label">City</label>
-          <input class="form-input" id="f_city" value="${esc(formData.city)}" placeholder="Fresno, CA" oninput="formData.city=this.value">
+          <input class="form-input" id="f_city" value="${esc(formData.city)}" placeholder="" oninput="formData.city=this.value">
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Phone</label>
-          <input class="form-input" id="f_phone" type="tel" value="${esc(formData.phone)}" placeholder="(559) 555-1234" oninput="formData.phone=this.value">
+          <input class="form-input" id="f_phone" type="tel" value="${esc(formData.phone)}" placeholder="" oninput="formData.phone=this.value">
         </div>
         <div class="form-group">
           <label class="form-label">Email</label>
-          <input class="form-input" id="f_email" type="email" value="${esc(formData.email)}" placeholder="owner@biz.com" oninput="formData.email=this.value">
+          <input class="form-input" id="f_email" type="email" value="${esc(formData.email)}" placeholder="" oninput="formData.email=this.value">
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Est. Value ($)</label>
-          <input class="form-input" id="f_value" type="number" value="${formData.value||''}" placeholder="0" min="0" step="100" oninput="formData.value=this.value">
+          <input class="form-input" id="f_value" type="number" value="${formData.value||''}" placeholder="" min="0" step="100" oninput="formData.value=this.value">
         </div>
         <div class="form-group">
           <label class="form-label">Product Interest</label>
-          <input class="form-input" id="f_product" value="${esc(formData.product)}" placeholder="Crane, stickers..." oninput="formData.product=this.value">
+          <input class="form-input" id="f_product" value="${esc(formData.product)}" placeholder="" oninput="formData.product=this.value">
         </div>
       </div>
       <div class="form-group">
@@ -1129,7 +1129,7 @@ function renderFormModal() {
       </div>
       <div class="form-group">
         <label class="form-label highlight">Current Operator / Competitor</label>
-        <input class="form-input" id="f_operator" value="${esc(formData.operator)}" placeholder="Bar Partners, Amuze, none..." oninput="formData.operator=this.value" style="border-color:rgba(234,179,8,0.2)">
+        <input class="form-input" id="f_operator" value="${esc(formData.operator)}" placeholder="" oninput="formData.operator=this.value" style="border-color:rgba(234,179,8,0.2)">
       </div>
       <div class="form-group">
         <label class="form-label">Contact Method</label>
@@ -1158,7 +1158,7 @@ function renderFormModal() {
       </div>
       <div class="form-group">
         <label class="form-label">Notes</label>
-        <textarea class="form-input" id="f_notes" placeholder="Details about this lead..." oninput="formData.notes=this.value">${esc(formData.notes)}</textarea>
+        <textarea class="form-input" id="f_notes" placeholder="" oninput="formData.notes=this.value">${esc(formData.notes)}</textarea>
       </div>
       ${activityHtml}
       <button class="btn-primary" onclick="submitForm()" ${!(formData.business||'').trim()?'disabled':''}>${isEdit ? 'Save Changes' : 'Add Lead'}</button>
