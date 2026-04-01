@@ -457,6 +457,7 @@ let quickActionId = null;
 let showSettings = false;
 let bulkMode = false;
 let bulkSelected = new Set();
+let selectedMonthOffset = 0; // 0 = current month, -1 = last month, etc.
 
 // ============ DATA ============
 function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
@@ -556,9 +557,10 @@ function weekRange() {
   return [mon, sun];
 }
 
-function monthRange() {
+function monthRange(offset) {
+  const off = offset !== undefined ? offset : 0;
   const n = new Date();
-  return [new Date(n.getFullYear(), n.getMonth(), 1), new Date(n.getFullYear(), n.getMonth()+1, 0, 23,59,59)];
+  return [new Date(n.getFullYear(), n.getMonth() + off, 1), new Date(n.getFullYear(), n.getMonth() + off + 1, 0, 23,59,59)];
 }
 
 function inRange(ds, [s, e]) {
@@ -622,7 +624,7 @@ function methodLabel(val) {
 
 // ============ COMPUTED ============
 function getWeekLeads() { const [s,e] = weekRange(); return leads.filter(l => inRange(l.contactedDate, [s,e])); }
-function getMonthLeads() { const [s,e] = monthRange(); return leads.filter(l => inRange(l.contactedDate, [s,e])); }
+function getMonthLeads(offset) { const [s,e] = monthRange(offset !== undefined ? offset : 0); return leads.filter(l => inRange(l.contactedDate, [s,e])); }
 
 function getOverdueCount() {
   return leads.filter(l => daysUntil(l.followUpDate) < 0 && !['signed','not-interested','won','lost'].includes(l.status)).length;
@@ -795,8 +797,9 @@ function importData() {
 }
 
 function printReport() {
-  const ml = getMonthLeads();
-  const monthName = new Date().toLocaleDateString('en-US', { month:'long', year:'numeric' });
+  const ml = getMonthLeads(selectedMonthOffset);
+  const [pMs] = monthRange(selectedMonthOffset);
+  const monthName = pMs.toLocaleDateString('en-US', { month:'long', year:'numeric' });
   const signed = ml.filter(l => l.status==='signed'||l.status==='won').length;
   const interested = ml.filter(l => l.status==='interested').length;
   const followUp = ml.filter(l => l.status==='follow-up'||l.status==='quoted').length;
@@ -1199,13 +1202,18 @@ function renderWeekView() {
 }
 
 function renderMonthView() {
-  const ml = getMonthLeads();
-  const [mS] = monthRange();
-  const monthName = new Date().toLocaleDateString('en-US', { month:'long', year:'numeric' });
+  const ml = getMonthLeads(selectedMonthOffset);
+  const [mS] = monthRange(selectedMonthOffset);
+  const monthName = mS.toLocaleDateString('en-US', { month:'long', year:'numeric' });
+  const isCurrentMonth = selectedMonthOffset === 0;
 
   let h = `<div class="view-container">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div class="section-label" style="margin:0">${monthName.toUpperCase()}</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="icon-btn" onclick="selectedMonthOffset--;render()" title="Previous month" style="width:32px;height:32px;font-size:14px">&#9664;</button>
+        <div class="section-label" style="margin:0">${monthName.toUpperCase()}</div>
+        <button class="icon-btn" onclick="selectedMonthOffset++;render()" title="Next month" style="width:32px;height:32px;font-size:14px;${isCurrentMonth?'opacity:0.3;pointer-events:none':''}">&#9654;</button>
+      </div>
       <button class="print-btn" onclick="printReport()">&#128424; Print Report</button>
     </div>
     <div class="stats-grid" style="margin-bottom:16px">
@@ -1238,7 +1246,7 @@ function renderMonthView() {
 
   h += `<div class="section-label" style="margin-top:16px">Full Log -- ${ml.length} Leads</div>`;
   if (ml.length === 0) {
-    h += `<div style="color:var(--text-dim);font-size:13px;padding:20px 0">No leads logged this month yet.</div>`;
+    h += `<div style="color:var(--text-dim);font-size:13px;padding:20px 0">No leads logged for ${monthName}.</div>`;
   } else {
     groupByDay(ml).forEach(([date, dl]) => {
       h += `<div class="day-group"><div class="day-label">${fmtDate(date)} -- ${dl.length} lead${dl.length!==1?'s':''}</div>`;
