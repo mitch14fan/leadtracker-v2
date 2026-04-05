@@ -502,6 +502,129 @@ function load() {
   }
 }
 
+function seedPizzaFactory() {
+  const SEED_KEY = 'lt2_pf_seeded';
+  if (localStorage.getItem(SEED_KEY)) return;
+  const existing = new Set(leads.map(l => (l.business||'').toLowerCase() + '|' + (l.city||'').toLowerCase()));
+  const pfLeads = [
+    {business:'Pizza Factory - Anza', contact:'', phone:'', email:'anza@pizzafactory.com', city:'Anza, CA'},
+    {business:'Pizza Factory - Apple Valley', contact:'', phone:'', email:'applevalley@pizzafactory.com', city:'Apple Valley, CA'},
+    {business:'Pizza Factory - Arnold', contact:'', phone:'', email:'arnold@pizzafactory.com', city:'Arnold, CA'},
+    {business:'Pizza Factory - Atwater', contact:'Nick & Josslyn Ahnen', phone:'', email:'atwater@pizzafactory.com', city:'Atwater, CA'},
+    {business:'Pizza Factory - Bakersfield', contact:'Andrew Kim', phone:'', email:'bakersfieldstine@pizzafactory.com', city:'Bakersfield, CA'},
+    {business:'Pizza Factory - Bishop', contact:'Marty West', phone:'', email:'bishop@pizzafactory.com', city:'Bishop, CA'},
+    {business:'Pizza Factory - Cameron Park', contact:'', phone:'', email:'cameronpark@pizzafactory.com', city:'Cameron Park, CA'},
+    {business:'Pizza Factory - Chester', contact:'', phone:'', email:'chester@pizzafactory.com', city:'Chester, CA'},
+    {business:'Pizza Factory - Clovis', contact:'Sukhbir & Pavenjit Dhillon', phone:'', email:'clovis@pizzafactory.com', city:'Clovis, CA'},
+    {business:'Pizza Factory - Corcoran', contact:'', phone:'', email:'corcoran@pizzafactory.com', city:'Corcoran, CA'},
+    {business:'Pizza Factory - Denair', contact:'', phone:'', email:'denair@pizzafactory.com', city:'Denair, CA'},
+    {business:'Pizza Factory - Dos Palos', contact:'', phone:'', email:'dospalos@pizzafactory.com', city:'Dos Palos, CA'},
+    {business:'Pizza Factory - Dunsmuir', contact:'Carlos & Alicia Pizano', phone:'', email:'dunsmuir@pizzafactory.com', city:'Dunsmuir, CA'},
+    {business:'Pizza Factory - Firebaugh', contact:'', phone:'', email:'firebaugh@pizzafactory.com', city:'Firebaugh, CA'},
+    {business:'Pizza Factory - Fowler', contact:'', phone:'', email:'fowler@pizzafactory.com', city:'Fowler, CA'},
+    {business:'Pizza Factory - Fresno', contact:'Francisco & Lorraine Padilla', phone:'', email:'fresno@pizzafactory.com', city:'Fresno, CA'},
+    {business:'Pizza Factory - Friant', contact:'', phone:'', email:'friant@pizzafactory.com', city:'Friant, CA'},
+    {business:'Pizza Factory - Gilroy', contact:'', phone:'', email:'gilroy@pizzafactory.com', city:'Gilroy, CA'},
+    {business:'Pizza Factory - Groveland', contact:'', phone:'', email:'groveland@pizzafactory.com', city:'Groveland, CA'},
+    {business:'Pizza Factory - Gustine', contact:'', phone:'', email:'gustine@pizzafactory.com', city:'Gustine, CA'},
+    {business:'Pizza Factory - Hesperia', contact:'', phone:'', email:'hesperia@pizzafactory.com', city:'Hesperia, CA'},
+    {business:'Pizza Factory - Hughson', contact:'', phone:'', email:'hughson@pizzafactory.com', city:'Hughson, CA'},
+    {business:'Pizza Factory - Janesville', contact:'', phone:'', email:'janesville@pizzafactory.com', city:'Janesville, CA'},
+    {business:'Pizza Factory - Lake Isabella', contact:'', phone:'', email:'lakeisabella@pizzafactory.com', city:'Lake Isabella, CA'},
+    {business:'Pizza Factory - LeGrand', contact:'', phone:'', email:'legrand@pizzafactory.com', city:'LeGrand, CA'},
+    {business:'Pizza Factory - Live Oak', contact:'', phone:'', email:'liveoak@pizzafactory.com', city:'Live Oak, CA'},
+    {business:'Pizza Factory - Loomis', contact:'Eric Lombardi', phone:'', email:'loomis@pizzafactory.com', city:'Loomis, CA'},
+    {business:'Pizza Factory - Lotus', contact:'', phone:'', email:'lotus@pizzafactory.com', city:'Lotus, CA'},
+    {business:'Pizza Factory - Madera Ranchos', contact:'', phone:'', email:'madera@pizzafactory.com', city:'Madera, CA'},
+    {business:'Pizza Factory - Madera West', contact:'', phone:'', email:'maderawest@pizzafactory.com', city:'Madera, CA'},
+    {business:'Pizza Factory - Mariposa', contact:'', phone:'', email:'mariposa@pizzafactory.com', city:'Mariposa, CA'},
+    {business:'Pizza Factory - Mendota', contact:'', phone:'', email:'mendota@pizzafactory.com', city:'Mendota, CA'},
+    {business:'Pizza Factory - Menifee', contact:'Jack Buss', phone:'', email:'menifee@pizzafactory.com', city:'Menifee, CA'},
+    {business:'Pizza Factory - Merced', contact:'', phone:'', email:'merced@pizzafactory.com', city:'Merced, CA'},
+    {business:'Pizza Factory - Monterey', contact:'', phone:'', email:'monterey@pizzafactory.com', city:'Monterey, CA'},
+    {business:'Pizza Factory - Murrieta', contact:'', phone:'', email:'murrieta@pizzafactory.com', city:'Murrieta, CA'},
+    {business:'Pizza Factory - North Fork', contact:'James Silva', phone:'', email:'northfork@pizzafactory.com', city:'North Fork, CA'},
+    {business:'Pizza Factory - Oakhurst', contact:'Jeff Chew', phone:'', email:'oakhurst@pizzafactory.com', city:'Oakhurst, CA'},
+    {business:'Pizza Factory - Paradise', contact:'Barry & Bartev Avakian', phone:'', email:'paradise@pizzafactory.com', city:'Paradise, CA'},
+    {business:'Pizza Factory - Phelan', contact:'Kimberly & Brian Lombardi', phone:'', email:'phelan@pizzafactory.com', city:'Phelan, CA'},
+    {business:'Pizza Factory - Placerville', contact:'Terri & Dave Thomas', phone:'', email:'placerville@pizzafactory.com', city:'Placerville, CA'},
+    {business:'Pizza Factory - Pleasant Valley', contact:'Terri & Dave Thomas', phone:'', email:'pleasantvalley@pizzafactory.com', city:'Pleasant Valley, CA'},
+    {business:'Pizza Factory - Pollock Pines', contact:'Terri & Dave Thomas', phone:'', email:'pollockpines@pizzafactory.com', city:'Pollock Pines, CA'},
+    {business:'Pizza Factory - Portola', contact:'', phone:'', email:'portola@pizzafactory.com', city:'Portola, CA'},
+    {business:'Pizza Factory - Prather', contact:'', phone:'', email:'prather@pizzafactory.com', city:'Prather, CA'},
+    {business:'Pizza Factory - Redding', contact:'Carlos & Alicia Pizano', phone:'', email:'redding@pizzafactory.com', city:'Redding, CA'},
+    {business:'Pizza Factory - Rio Vista', contact:'', phone:'', email:'riovista@pizzafactory.com', city:'Rio Vista, CA'},
+    {business:'Pizza Factory - Riverside Orangecrest', contact:'', phone:'', email:'orangecrest@pizzafactory.com', city:'Riverside, CA'},
+    {business:'Pizza Factory - Rocklin', contact:'SKYS Ventures', phone:'', email:'rocklin@pizzafactory.com', city:'Rocklin, CA'},
+    {business:'Pizza Factory - North Salinas', contact:'', phone:'', email:'northsalinas@pizzafactory.com', city:'Salinas, CA'},
+    {business:'Pizza Factory - South Salinas', contact:'', phone:'', email:'southsalinas@pizzafactory.com', city:'Salinas, CA'},
+    {business:'Pizza Factory - San Andreas', contact:'Allison Williams', phone:'', email:'sanandreas@pizzafactory.com', city:'San Andreas, CA'},
+    {business:'Pizza Factory - San Juan Bautista', contact:'', phone:'', email:'sanjuanbautista@pizzafactory.com', city:'San Juan Bautista, CA'},
+    {business:'Pizza Factory - Susanville', contact:'Jeff Chew', phone:'', email:'susanville@pizzafactory.com', city:'Susanville, CA'},
+    {business:'Pizza Factory - Taft', contact:'Josh Bryant', phone:'', email:'taft@pizzafactory.com', city:'Taft, CA'},
+    {business:'Pizza Factory - Temecula', contact:'', phone:'', email:'temecula@pizzafactory.com', city:'Temecula, CA'},
+    {business:'Pizza Factory - Turlock', contact:'Luis & Sandy Marquez', phone:'', email:'turlock@pizzafactory.com', city:'Turlock, CA'},
+    {business:'Pizza Factory - Twain Harte', contact:'Allison Williams & Cameron Bacchus', phone:'', email:'twainharte@pizzafactory.com', city:'Twain Harte, CA'},
+    {business:'Pizza Factory - Valley Springs', contact:'', phone:'', email:'valleysprings@pizzafactory.com', city:'Valley Springs, CA'},
+    {business:'Pizza Factory - Visalia', contact:'', phone:'', email:'visalia@pizzafactory.com', city:'Visalia, CA'},
+    {business:'Pizza Factory - Walnut Grove', contact:'', phone:'', email:'walnutgrove@pizzafactory.com', city:'Walnut Grove, CA'},
+    {business:'Pizza Factory - Wasco', contact:'Frank Almanza', phone:'', email:'wasco@pizzafactory.com', city:'Wasco, CA'},
+    {business:'Pizza Factory - Weed', contact:'', phone:'', email:'weed@pizzafactory.com', city:'Weed, CA'},
+    {business:'Pizza Factory - Willow Creek', contact:'', phone:'', email:'willowcreek@pizzafactory.com', city:'Willow Creek, CA'},
+    {business:'Pizza Factory - Winters', contact:'', phone:'', email:'winters@pizzafactory.com', city:'Winters, CA'},
+    {business:'Pizza Factory - Woodlake', contact:'', phone:'', email:'woodlake@pizzafactory.com', city:'Woodlake, CA'},
+    {business:'Pizza Factory - Carlin', contact:'', phone:'', email:'carlin@pizzafactory.com', city:'Carlin, NV'},
+    {business:'Pizza Factory - Carson City', contact:'', phone:'', email:'carsoncity@pizzafactory.com', city:'Carson City, NV'},
+    {business:'Pizza Factory - Dayton', contact:'Nathan & Austin Haynes', phone:'', email:'dayton@pizzafactory.com', city:'Dayton, NV'},
+    {business:'Pizza Factory - Fallon', contact:'Eric Lombardi', phone:'', email:'fallon@pizzafactory.com', city:'Fallon, NV'},
+    {business:'Pizza Factory - Fernley', contact:'Eric Lombardi', phone:'', email:'fernley@pizzafactory.com', city:'Fernley, NV'},
+    {business:'Pizza Factory - Lovelock', contact:'', phone:'', email:'lovelock@pizzafactory.com', city:'Lovelock, NV'},
+    {business:'Pizza Factory - Minden', contact:'Angela & Kevin Campbell', phone:'', email:'minden@pizzafactory.com', city:'Minden, NV'},
+    {business:'Pizza Factory - Reno Red Rock', contact:'', phone:'', email:'redrock@pizzafactory.com', city:'Reno, NV'},
+    {business:'Pizza Factory - Reno Southwest', contact:'', phone:'', email:'renosouthwest@pizzafactory.com', city:'Reno, NV'},
+    {business:'Pizza Factory - Silver Springs', contact:'Eric Lombardi', phone:'', email:'silversprings@pizzafactory.com', city:'Silver Springs, NV'},
+    {business:'Pizza Factory - Sparks', contact:'', phone:'', email:'spanishsprings@pizzafactory.com', city:'Sparks, NV'},
+  ];
+  let added = 0;
+  // Spread dates across March 2026
+  const marchDays = pfLeads.map((_, i) => {
+    const day = Math.min(1 + Math.floor(i * 30 / pfLeads.length), 31);
+    return '2026-03-' + String(day).padStart(2, '0');
+  });
+  pfLeads.forEach((pf, i) => {
+    const sig = (pf.business||'').toLowerCase() + '|' + (pf.city||'').toLowerCase();
+    if (existing.has(sig)) return;
+    leads.push({
+      id: genId() + '_pf' + i,
+      business: pf.business,
+      contact: pf.contact,
+      phone: pf.phone,
+      email: pf.email,
+      city: pf.city,
+      equipment: [],
+      operator: '',
+      notes: 'Email outreach sent via Pizza Factory campaign',
+      status: 'contacted',
+      contactMethod: 'email',
+      contactedDate: marchDays[i],
+      followUpDays: 60,
+      followUpDate: addDays(marchDays[i], 60),
+      value: '',
+      product: '',
+      activity: [{date: marchDays[i], note: 'Initial email sent to ' + pf.email}],
+      created: new Date(marchDays[i] + 'T12:00:00').getTime(),
+    });
+    added++;
+  });
+  if (added > 0) {
+    save();
+    localStorage.setItem(SEED_KEY, '1');
+    showToast('Added ' + added + ' Pizza Factory leads for March');
+  } else {
+    localStorage.setItem(SEED_KEY, '1');
+  }
+}
+
 function migrateLead(l) {
   // Normalize fields from both legacy formats
   const out = {
@@ -1376,6 +1499,7 @@ window.showToast = showToast;
 
 // ============ INIT ============
 load();
+seedPizzaFactory();
 render();
 </script>
 </body>
