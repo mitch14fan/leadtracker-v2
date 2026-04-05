@@ -625,6 +625,57 @@ function seedPizzaFactory() {
   }
 }
 
+function seedMarch2026Leads() {
+  const SEED_KEY = 'lt2_mar26_seeded';
+  if (localStorage.getItem(SEED_KEY)) return;
+  const existing = new Set(leads.map(l => (l.business||'').toLowerCase()));
+  const newLeads = [
+    {business:'Mountain Mikes Merced Yosemite Parkway', contactMethod:'phone', status:'new', operator:'Jos', followUpDays:40},
+    {business:'Mountain Mikes Merced Olive Avenue', contactMethod:'phone', status:'new', operator:'Jos', followUpDays:40},
+    {business:'Mountain Mike Merced', contactMethod:'phone', status:'new', operator:'Jos', followUpDays:55},
+    {business:'Mountain Mikes Los Banos', contactMethod:'phone', status:'new', operator:'Jos', followUpDays:40},
+    {business:'Mountain Mikes Atwater', contactMethod:'in-person', status:'new', operator:'Jos', followUpDays:55},
+    {business:'Round Table Sonora', contactMethod:'text', status:'follow-up', operator:'Jos', followUpDays:55},
+    {business:'Premier Pizza Madera', contactMethod:'text', status:'new', operator:'Jos', followUpDays:55},
+    {business:'Mountain Mikes Cameron Park', contactMethod:'text', status:'contacted', operator:'', followUpDays:25},
+    {business:'Mountain Mikes Bakersfield', contactMethod:'text', status:'follow-up', operator:'Nen', followUpDays:55},
+    {business:'Mission Pizza Stockton', contactMethod:'email', status:'new', operator:'', followUpDays:60},
+  ];
+  let added = 0;
+  newLeads.forEach((nl, i) => {
+    if (existing.has(nl.business.toLowerCase())) return;
+    const dateStr = '2026-03-' + String(Math.min(1 + i * 3, 28)).padStart(2, '0');
+    leads.push({
+      id: genId() + '_ml' + i,
+      business: nl.business,
+      contact: '',
+      phone: '',
+      email: '',
+      city: '',
+      equipment: [],
+      operator: nl.operator,
+      notes: '',
+      status: nl.status,
+      contactMethod: nl.contactMethod,
+      contactedDate: dateStr,
+      followUpDays: nl.followUpDays,
+      followUpDate: addDays(dateStr, nl.followUpDays),
+      value: '',
+      product: '',
+      activity: [{date: dateStr, note: 'Lead added — March 2026 batch'}],
+      created: new Date(dateStr + 'T12:00:00').getTime(),
+    });
+    added++;
+  });
+  if (added > 0) {
+    save();
+    localStorage.setItem(SEED_KEY, '1');
+    showToast('Added ' + added + ' new leads for March 2026');
+  } else {
+    localStorage.setItem(SEED_KEY, '1');
+  }
+}
+
 function migrateLead(l) {
   // Normalize fields from both legacy formats
   const out = {
@@ -1500,6 +1551,7 @@ window.showToast = showToast;
 // ============ INIT ============
 load();
 seedPizzaFactory();
+seedMarch2026Leads();
 render();
 </script>
 </body>
